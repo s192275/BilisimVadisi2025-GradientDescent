@@ -1,55 +1,72 @@
-Bu Streamlit arayüzü Teknofest 2025 Doğal Dil İşleme yarışması kapsamında Serbest Kategori altında GradientDescent ekibi tarafından geliştirilmiştir.
 
-**1. Oluşturulan Sistemin Amacı**
 
-Bu projenin temel amacı, yaşlı bireylerin ilaç prospektüslerini daha kolay ve etkili bir şekilde anlayabilmelerini sağlamaktır. Göz sağlığı, dijital okuryazarlık düzeyi ve bilişsel nedenlerle ilaç içeriklerini okumakta veya anlamakta zorlanan bireyler için bir mobil destek sistemi geliştirilmesi planlanmıştır. Sistem; kullanıcıdan alınan ilaç görselini analiz ederek içeriğini okur, prospektüsü anlamlı bir şekilde özetler ve bireyin sesli sorularını anlayıp yanıtlar. Böylece yaşlı bireylerin ilaçlar hakkında bilinçli karar vermeleri, yanlış kullanımın önlenmesi ve bağımsızlıklarının artırılması hedeflenmiştir.
+# Teknofest 2025 Doğal Dil İşleme Yarışması  
+## **GradientDescent Ekibi: Yaşlı Dostu İlaç Prospektüsü Sistemi**
 
-**2. İşleyiş**
+---
 
-Sistem aşağıdaki adımlarla çalışır:
+### **Projenin Vizyonu**
 
-*Fotoğraf Yükleme: Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını sisteme yükler.
+GradientDescent ekibi olarak, **Teknofest 2025 Doğal Dil İşleme Yarışması Serbest Kategori** kapsamında geliştirdiğimiz bu proje, yaşlı bireylerin ilaç prospektüslerini kolayca anlamalarını ve sağlık bilgilerine erişimlerini artırmayı amaçlıyor. Görme, dijital okuryazarlık veya bilişsel zorluklar nedeniyle prospektüsleri anlamakta güçlük çeken bireyler için **kullanıcı dostu, sesli destekli ve erişilebilir** bir sistem tasarladık. Amacımız, yaşlı bireylerin **ilaç güvenliğini artırmak**, yanlış kullanımları önlemek ve **bağımsızlıklarını desteklemek**!
 
-*Optik Karakter Tanıma (OCR): Yüklenen görsel EasyOCR kütüphanesi ile işlenir ve metin çıkarımı yapılır.
+---
 
-*Web Üzerinden Bilgi Toplama: Çıkarılan metin üzerinden DuckDuckGo arama motoru kullanılarak ilaca dair güncel ve doğru bilgiler toplanır.
+### **Sistem Nasıl Çalışıyor?**
 
-*Prospektüs Özeti: Intelligent-Internet/II-Medical8B-1706 adlı büyük dil modeli kullanılarak prospektüsün sade ve anlaşılır bir özeti oluşturulur.
+Sistem, yaşlı bireylerin ihtiyaçlarına özel olarak tasarlanmış, sezgisel ve etkileşimli bir süreç sunar:
 
-*Soru-Cevap Modülü: Kullanıcı ilaca dair sesli sorular yöneltir. Soru önce speech-to-text modülü ile yazıya çevrilir, ardından dil modeli soruyu yanıtlar ve yanıt text-to-speech ile sesli şekilde kullanıcıya sunulur.
+1. **📷 Fotoğraf Yükleme**: Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını Streamlit arayüzüne kolayca yükler.
+2. **🔍 Optik Karakter Tanıma (OCR)**: EasyOCR ile görseldeki metin hızlıca çıkarılır.
+3. **🌐 Web’den Bilgi Toplama**: PyDuckDuckGo ile ilaca dair güncel ve güvenilir bilgiler toplanır.
+4. **📝 Prospektüs Özeti**: Intelligent-Internet/II-Medical8B-1706 modeli, prospektüsü sade, anlaşılır ve yaşlı dostu bir şekilde özetler.
+5. **🎤 Sesli Soru-Cevap**: Kullanıcı, ilaca dair sorularını sesli sorar. SpeechRecognition ve Whisper ile sorular metne çevrilir, model tarafından yanıtlanır ve gTTS ile sesli olarak kullanıcıya sunulur.
+6. **🔊 Tamamen Sesli Etkileşim**: Dokunmatik ekran veya okuma gerektirmeden, sesli komutlarla sistem kolayca kullanılır.
 
-*Sesli Etkileşim: Girdiler ve çıktılar sesli desteklidir, böylece yaşlı bireyler dokunmadan veya okuma zorunluluğu olmadan sistemi kullanabilir.
+---
 
-**3. Kullanılan Teknolojiler**
+### **Kullanılan Teknolojiler**
 
-EasyOCR
+- **EasyOCR**: Görselden metin çıkarma için hızlı ve doğru çözüm.
+- **PyDuckDuckGo**: Güvenilir web verileri toplama.
+- **Intelligent-Internet/II-Medical8B-1706**: Prospektüs özetleme ve akıllı soru-cevap.
+- **gTTS**: Yazıyı doğal ses çıkışına dönüştürme.
+- **SpeechRecognition & Whisper**: Sesli girdileri metne çevirme.
+- **Streamlit**: Kullanıcı dostu ve modern web arayüzü.
 
-PyDuckDuckGo
+Sistem, **Hugging Face token** ve **GOOGLE_API_KEY** ile entegre bir şekilde Streamlit platformunda çalışmaktadır.
 
-Intelligent-Internet/II-Medical8B-1706
+---
 
-gTTS 
+### **Gelecekteki Yenilikler**
 
-SpeechRecognition, Whisper
+Projemiz, mevcut haliyle güçlü bir temel sunuyor ve ilerleyen süreçlerde daha da gelişecek:
 
-Streamlit
+- **📱 Mobil Uygulama Geliştirme**: Sistem testleri tamamlandıktan sonra, kullanıcı dostu bir mobil uygulama tasarlanacak ve uygulama mağazalarında yerini alacak.
+- **🧠 Gelişmiş NLP Özetleme**: Mobil uygulamada, ilaç prospektüslerinin özetlenmesi için ileri düzey doğal dil işleme (NLP) teknikleri kullanılacak.
+- **🚫 İlaç Dışı İçerik Kısıtlamaları**: İlaç dışı görsellerin yüklenmesini engelleyen filtreleme mekanizmaları eklenecek.
+- **🎯 Özel Başlık Erişimi**: Kullanıcılar, **yan etkiler**, **kullanım talimatları** veya **kontrendikasyonlar** gibi belirli başlıkları doğrudan görüntüleyip dinleyebilecek.
+- **📚 Büyük Dil Modeli İnce Ayar**: Kullanıcıların sorularına cevap verebilmesi için mobilde çalışabilecek küçük model eğitimleri yapılacaktır.
 
-**4. İnsanlığa Yararları ve Etkileşimler**
+---
 
-**Toplumsal Faydalar:**
+### **İnsanlığa Katkılar**
 
-Yaşlı Dostu Tasarım: Görme ve okuma güçlüğü çeken bireyler için erişilebilirlik sağlar.
+#### **Toplumsal Faydalar**
+- **👴 Yaşlı Dostu Tasarım**: Görme veya okuma güçlüğü çeken bireyler için erişilebilir bir deneyim.
+- **🛡️ İlaç Güvenliği**: Yanlış kullanım riskini azaltır, ilaç etkileşimleri hakkında bilgi sunar.
+- **🌟 Bağımsızlık**: Yaşlı bireylerin eczane veya bakıcılara bağımlılığı azalır.
+- **📚 Sağlık Okuryazarlığı**: Karmaşık prospektüsleri sadeleştirerek bilgiye erişimi kolaylaştırır.
 
-İlaç Güvenliği: Yanlış ilaç kullanımı riskini azaltır, ilaç etkileşimleri konusunda bilgi verir.
+#### **Etkileşim ve İş Birlikleri**
+- **👨‍👩‍👧 Aileler ve Bakıcılar**: Yaşlı bireylerin sağlık sorularına hızlı yanıtlarla güven sağlar.
+- **🏥 Sağlık Kuruluşları**: Evde bakım sistemlerine entegre edilebilir bir çözüm.
+- **💊 Eczaneler**: Reçetesiz ilaçlar için dijital danışmanlık aracı olarak kullanılabilir.
 
-Bağımsızlık: Bireylerin eczaneye ya da aile üyelerine bağlı kalmadan bilgiye ulaşmalarını sağlar.
+---
 
-Sağlık Okuryazarlığı: Prospektüsler sadeleştirilerek bireylerin ilacı daha iyi anlamaları sağlanır.
+### **Neden GradientDescent?**
 
-**Etkileşim:**
+GradientDescent ekibi olarak, teknolojinin insan hayatını kolaylaştırması gerektiğine inanıyoruz. Yaşlı bireylerin sağlık hizmetlerine erişimdeki zorluklarını çözmek için **insan odaklı, yenilikçi ve erişilebilir** bir sistem geliştirdik. Teknofest 2025’te bu vizyonu hayata geçirerek, **yaşlı dostu teknolojilerle sağlık okuryazarlığını güçlendirmeyi** ve topluma değer katmayı hedefliyoruz!
 
-Aileler & Bakıcılar: Yaşlı bireylerin sağlıkla ilgili sorularına daha hızlı yanıt almasını sağlayarak onlara güven verir.
+**GradientDescent ile sağlık bilgisi herkes için erişilebilir!**
 
-Sağlık Kuruluşları: Evde bakım sistemlerine entegre edilebilir.
-
-Eczaneler: Reçete dışı ilaçlar için danışmanlık hizmetlerinin dijital uzantısı olabilir.
