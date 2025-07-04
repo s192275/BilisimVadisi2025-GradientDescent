@@ -8,17 +8,17 @@ Bu projenin temel amacı, yaşlı bireylerin ilaç prospektüslerini daha kolay 
 
 Sistem aşağıdaki adımlarla çalışır:
 
-**1.Fotoğraf Yükleme:** Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını sisteme yükler.
+*Fotoğraf Yükleme: Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını sisteme yükler.
 
-**2.Optik Karakter Tanıma (OCR):** Yüklenen görsel EasyOCR kütüphanesi ile işlenir ve metin çıkarımı yapılır.
+*Optik Karakter Tanıma (OCR): Yüklenen görsel EasyOCR kütüphanesi ile işlenir ve metin çıkarımı yapılır.
 
-**3.Web Üzerinden Bilgi Toplama:** Çıkarılan metin üzerinden DuckDuckGo arama motoru kullanılarak ilaca dair güncel ve doğru bilgiler toplanır.
+*Web Üzerinden Bilgi Toplama: Çıkarılan metin üzerinden DuckDuckGo arama motoru kullanılarak ilaca dair güncel ve doğru bilgiler toplanır.
 
-**4.Prospektüs Özeti:** Intelligent-Internet/II-Medical8B-1706 adlı büyük dil modeli kullanılarak prospektüsün sade ve anlaşılır bir özeti oluşturulur.
+*Prospektüs Özeti: Intelligent-Internet/II-Medical8B-1706 adlı büyük dil modeli kullanılarak prospektüsün sade ve anlaşılır bir özeti oluşturulur.
 
-**5.Soru-Cevap Modülü:** Kullanıcı ilaca dair sesli sorular yöneltir. Soru önce speech-to-text modülü ile yazıya çevrilir, ardından dil modeli soruyu yanıtlar ve yanıt text-to-speech ile sesli şekilde kullanıcıya sunulur.
+*Soru-Cevap Modülü: Kullanıcı ilaca dair sesli sorular yöneltir. Soru önce speech-to-text modülü ile yazıya çevrilir, ardından dil modeli soruyu yanıtlar ve yanıt text-to-speech ile sesli şekilde kullanıcıya sunulur.
 
-**6.Sesli Etkileşim:** Girdiler ve çıktılar sesli desteklidir, böylece yaşlı bireyler dokunmadan veya okuma zorunluluğu olmadan sistemi kullanabilir.
+*Sesli Etkileşim: Girdiler ve çıktılar sesli desteklidir, böylece yaşlı bireyler dokunmadan veya okuma zorunluluğu olmadan sistemi kullanabilir.
 
 **3. Kullanılan Teknolojiler**
 
@@ -53,4 +53,3 @@ Aileler & Bakıcılar: Yaşlı bireylerin sağlıkla ilgili sorularına daha hı
 Sağlık Kuruluşları: Evde bakım sistemlerine entegre edilebilir.
 
 Eczaneler: Reçete dışı ilaçlar için danışmanlık hizmetlerinin dijital uzantısı olabilir.
-
