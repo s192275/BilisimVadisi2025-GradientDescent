@@ -1,9 +1,11 @@
 Bu Streamlit arayüzü Teknofest 2025 Doğal Dil İşleme yarışması kapsamında Serbest Kategori altında GradientDescent ekibi tarafından geliştirilmiştir.
 
 **1. Oluşturulan Sistemin Amacı**
+
 Bu projenin temel amacı, yaşlı bireylerin ilaç prospektüslerini daha kolay ve etkili bir şekilde anlayabilmelerini sağlamaktır. Göz sağlığı, dijital okuryazarlık düzeyi ve bilişsel nedenlerle ilaç içeriklerini okumakta veya anlamakta zorlanan bireyler için bir mobil destek sistemi geliştirilmesi planlanmıştır. Sistem; kullanıcıdan alınan ilaç görselini analiz ederek içeriğini okur, prospektüsü anlamlı bir şekilde özetler ve bireyin sesli sorularını anlayıp yanıtlar. Böylece yaşlı bireylerin ilaçlar hakkında bilinçli karar vermeleri, yanlış kullanımın önlenmesi ve bağımsızlıklarının artırılması hedeflenmiştir.
 
 **2. İşleyiş**
+
 Sistem aşağıdaki adımlarla çalışır:
 
 **1.Fotoğraf Yükleme:** Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını sisteme yükler.
@@ -19,6 +21,7 @@ Sistem aşağıdaki adımlarla çalışır:
 **6.Sesli Etkileşim:** Girdiler ve çıktılar sesli desteklidir, böylece yaşlı bireyler dokunmadan veya okuma zorunluluğu olmadan sistemi kullanabilir.
 
 **3. Kullanılan Teknolojiler**
+
 EasyOCR
 
 PyDuckDuckGo
@@ -34,6 +37,7 @@ Streamlit
 4. İnsanlığa Yararları ve Etkileşimler
 
 **Toplumsal Faydalar:**
+
 Yaşlı Dostu Tasarım: Görme ve okuma güçlüğü çeken bireyler için erişilebilirlik sağlar.
 
 İlaç Güvenliği: Yanlış ilaç kullanımı riskini azaltır, ilaç etkileşimleri konusunda bilgi verir.
@@ -43,6 +47,7 @@ Bağımsızlık: Bireylerin eczaneye ya da aile üyelerine bağlı kalmadan bilg
 Sağlık Okuryazarlığı: Prospektüsler sadeleştirilerek bireylerin ilacı daha iyi anlamaları sağlanır.
 
 **Etkileşim:**
+
 Aileler & Bakıcılar: Yaşlı bireylerin sağlıkla ilgili sorularına daha hızlı yanıt almasını sağlayarak onlara güven verir.
 
 Sağlık Kuruluşları: Evde bakım sistemlerine entegre edilebilir.
