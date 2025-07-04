@@ -34,7 +34,7 @@ SpeechRecognition, Whisper
 
 Streamlit
 
-4. İnsanlığa Yararları ve Etkileşimler
+**4. İnsanlığa Yararları ve Etkileşimler**
 
 **Toplumsal Faydalar:**
 
