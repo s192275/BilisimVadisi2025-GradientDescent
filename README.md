@@ -1,7 +1,7 @@
 
 
 # Teknofest 2025 Doğal Dil İşleme Yarışması  
-## **GradientDescent Ekibi: Yaşlı Dostu İlaç Prospektüsü Sistemi**
+## **GradientDescent Ekibi: Yaşlı Dostu İlaç Prospektüsü Sistemi - Derman**
 
 ---
 
