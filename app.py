@@ -12,9 +12,21 @@ import base64
 from gtts import gTTS
 from huggingface_hub import InferenceClient
 import re
-# Soru cevaba chunk size ekleyelim. Modelin cevaplama hızı artar.
+import sounddevice as sd
+import numpy as np
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, pipeline
+import torch
 
 load_dotenv()
+
+
+@st.cache_resource
+def load_stt_model():
+    processor = Wav2Vec2Processor.from_pretrained("Sercan/wav2vec2-xls-r-300m-tr")
+    model = Wav2Vec2ForCTC.from_pretrained("Sercan/wav2vec2-xls-r-300m-tr")
+    return processor, model
+
+processor, stt_model = load_stt_model()
 
 def get_response_with_medical_model(text):
     client = InferenceClient(
@@ -132,6 +144,20 @@ def qa_with_medical_model(text, ozet_metni):
     result = m2.group(1).strip()
     return result
 
+# Kullanıcıdan ses kaydı al ve yazıya çevir
+def record_and_transcribe(duration=20, sample_rate=16000):
+    st.info(f"{duration} saniyelik ses kaydı başlıyor, lütfen konuşun...")
+    audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1, dtype='float32')
+    sd.wait()
+    audio = np.squeeze(audio)
+
+    input_values = processor(audio, sampling_rate=sample_rate, return_tensors="pt", padding=True).input_values
+    with torch.no_grad():
+        logits = stt_model(input_values).logits
+    predicted_ids = torch.argmax(logits, dim=-1)
+    transcription = processor.batch_decode(predicted_ids)[0]
+    return transcription
+
 # Streamlit Arayüzü
 st.title("Medikal Prospektüs Özetleme ve Soru Cevaplama Uygulaması")
 st.write("Bu uygulama, medikal prospektüsleri özetler, seslendirir ve özetle ilgili soruları cevaplar.")
@@ -171,6 +197,13 @@ if uploaded_file:
         if soru:
             #cevap = cevapla_soru(soru, summarized_text)
             cevap = qa_with_medical_model(soru, summarized_text)
+            st.markdown("**Cevap:**")
+            st.write(cevap)
+                
+        if st.button("🎤 Sesli Soru Sor (20 saniye)"):
+            sesli_soru = record_and_transcribe()
+            st.success(f"Algılanan Soru: {sesli_soru}")
+            cevap = qa_with_medical_model(sesli_soru, summarized_text)
             st.markdown("**Cevap:**")
             st.write(cevap)
     else:
