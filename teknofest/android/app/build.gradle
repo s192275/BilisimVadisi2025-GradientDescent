@@ -1,0 +1,54 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "com.example.teknofest"
+
+    /* ─────────────────────────────────────────────
+       🟢 SDK SEVİYELERİ
+       ───────────────────────────────────────────── */
+    compileSdk = 35          // ← API 35
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId = "com.example.teknofest"
+
+        /*  minSdk, targetSdk ve versionCode / Name
+            flutter.* makrolarını kullanmaya devam edebilirsiniz
+            ancak targetSdk’yi elle aşıyoruz.                       */
+        minSdk       = flutter.minSdkVersion
+        targetSdk    = 35      // ← API 35  (🟢)
+        versionCode  = flutter.versionCode
+        versionName  = flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // İmza ayarı: şimdilik debug keystore
+            signingConfig = signingConfigs.debug
+            // istersen shrinkResources / minifyEnabled ekleyebilirsin
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+/* *****************************************************
+   Eğer kök build.gradle’da ext {} içinde
+   compileSdkVersion tanımlıysa, onu da
+   35’e yükseltmen gerekebilir.  (android/build.gradle)
+   ***************************************************** */
