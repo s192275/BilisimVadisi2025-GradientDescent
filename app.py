@@ -1,210 +1,157 @@
-import streamlit as st
-import easyocr
-from PIL import Image
-from duckduckgo_search import DDGS
+from flask import Flask, request, jsonify
+from ddgs import DDGS
 import requests
 from bs4 import BeautifulSoup
-from google import genai
-from dotenv import load_dotenv
-import os
-import io
-import base64
-from gtts import gTTS
 from huggingface_hub import InferenceClient
+import os
+from dotenv import load_dotenv
 import re
-import sounddevice as sd
-import numpy as np
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, pipeline
-import torch
+import base64
+import io
+import itertools
 
 load_dotenv()
+app = Flask(__name__)
 
+# Global değişken yerine dictionary kullan
+prospektus_cache = {}
 
-@st.cache_resource
-def load_stt_model():
-    processor = Wav2Vec2Processor.from_pretrained("Sercan/wav2vec2-xls-r-300m-tr")
-    model = Wav2Vec2ForCTC.from_pretrained("Sercan/wav2vec2-xls-r-300m-tr")
-    return processor, model
-
-processor, stt_model = load_stt_model()
-
-def get_response_with_medical_model(text):
-    client = InferenceClient(
-        provider="featherless-ai",
-        api_key=os.environ["HF_TOKEN"],
-    )
-
-    completion = client.chat.completions.create(
-        model="Intelligent-Internet/II-Medical-8B-1706",
-        messages=[
-            {
-                "role": "user",
-                "content": f"{text} bu mesajı medikal içeriğine uygun ve yaşlıların da anlayacağı şekilde kısaca özetle.Bütün metni paragraf yap. Madde başlıkları kullanma. Sadece özeti yaz."
-        }
-    ],
-)
-
-    msg = completion.choices[0].message
-    content = msg.content
-    m2 = re.search(r"</think>\s*(.*)", content, re.DOTALL)
-    result = m2.group(1).strip()
-    return result
-
-def vocaliaze_text(text):
-    try:
-        tts = gTTS(text=text, lang='tr')
-        speech_bytes = io.BytesIO()
-        tts.write_to_fp(speech_bytes)
-        speech_bytes.seek(0)
-        audio_base64 = base64.b64encode(speech_bytes.read()).decode('utf-8')
-        return audio_base64
-    except Exception as e:
-        st.error(f"Seslendirme hatası: {e}")
-        return None
-
-def summarize_text(text):
-    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=f"{text} Bu metni yaşlıların da anlayabileceği şekilde medikal içeriğine uygun bir şekilde kısaca özetle. Bütün metni paragraf yap. Madde başlıkları kullanma. Sadece özeti yaz.",
-    )
-    return response.text
-
-def duckduckgo_search(arama_metni, max_sonuc=5):
+def get_prospektus(ilac_adi):
+    query = f"{ilac_adi} prospektüsü"
     with DDGS() as ddgs:
-        results = list(ddgs.text(keywords=arama_metni, region='wt-wt', safesearch='moderate', max_results=max_sonuc))
+        gen = ddgs.text(query, region="wt-wt", safesearch="moderate")
+        results = list(itertools.islice(gen, 5))
+    
     if not results:
         return None
-
-    ilk = results[0]
-    url = ilk.get('href')
-
+    
+    url = results[0].get('href')
     try:
-        resp = requests.get(url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
-        resp.raise_for_status()
-        content_type = resp.headers.get('Content-Type', '').lower()
-
-        if 'text/html' in content_type:
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            body = soup.find('body')
-            metin = body.get_text(separator='\n', strip=True) if body else soup.get_text(separator='\n', strip=True)
-            return metin
-        else:
-            return None
-    except:
+        # Timeout artırıldı
+        resp = requests.get(url, timeout=30, headers={'User-Agent': 'Mozilla/5.0'})
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        
+        # Gereksiz elementleri kaldır
+        for element in soup(["script", "style", "nav", "header", "footer"]):
+            element.decompose()
+        
+        body = soup.find('body')
+        full_text = body.get_text(separator='\n', strip=True) if body else soup.get_text(separator='\n', strip=True)
+        
+        # Çok uzun metinleri sınırla (isteğe bağlı)
+        if len(full_text) > 50000:  # 50K karakter limiti
+            full_text = full_text[:50000] + "..."
+        
+        return full_text
+    except Exception as e:
+        print(f"Prospektüs alma hatası: {e}")
         return None
 
-def cevapla_soru(soru, ozet_metni):
-    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-    prompt = f"""
-    Aşağıda bir ilaç prospektüsünün özeti verilmiştir.
-    Sadece bu metne dayalı soruları cevapla.
-    Eğer soru bu metinle ilgili değilse, şu şekilde yanıtla: "Bu sorunun cevabı mevcut prospektüs içinde bulunmamaktadır."
-
-    Prospektüs Özeti:
-    \"\"\"{ozet_metni}\"\"\"
-
-    Soru: {soru}
-    """
-    yanit = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-    return yanit.text
-
-def qa_with_medical_model(text, ozet_metni):
-    client = InferenceClient(
-        provider="featherless-ai",
-        api_key=os.environ["HF_TOKEN"],
-    )
-    prompt = f"""
-        Aşağıda bir ilaç prospektüsünün özeti verilmiştir.
-        Sadece bu metne dayalı soruları cevapla.
-        Eğer soru bu metinle ilgili değilse, şu şekilde yanıtla: "Bu sorunun cevabı mevcut prospektüs içinde bulunmamaktadır."
-
-        Prospektüs Özeti:
-            \"\"\"{ozet_metni}\"\"\"
-
-        Soru: {soru}
-    """
-   
-    completion = client.chat.completions.create(
-        model="Intelligent-Internet/II-Medical-8B-1706",
-        messages=[
-            {
-                "role": "user",
-                "content": f"{prompt} "
-            }
-        ],
-    )
-
-    msg = completion.choices[0].message
-    content = msg.content
-    m2 = re.search(r"</think>\s*(.*)", content, re.DOTALL)
-    result = m2.group(1).strip()
-    return result
-
-# Kullanıcıdan ses kaydı al ve yazıya çevir
-def record_and_transcribe(duration=20, sample_rate=16000):
-    st.info(f"{duration} saniyelik ses kaydı başlıyor, lütfen konuşun...")
-    audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1, dtype='float32')
-    sd.wait()
-    audio = np.squeeze(audio)
-
-    input_values = processor(audio, sampling_rate=sample_rate, return_tensors="pt", padding=True).input_values
-    with torch.no_grad():
-        logits = stt_model(input_values).logits
-    predicted_ids = torch.argmax(logits, dim=-1)
-    transcription = processor.batch_decode(predicted_ids)[0]
-    return transcription
-
-# Streamlit Arayüzü
-st.title("Medikal Prospektüs Özetleme ve Soru Cevaplama Uygulaması")
-st.write("Bu uygulama, medikal prospektüsleri özetler, seslendirir ve özetle ilgili soruları cevaplar.")
-
-uploaded_file = st.file_uploader("Lütfen bir resim yükleyin", type=["jpg", "jpeg", "png"])
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Yüklenen Resim", use_column_width=True)
+def summarize_with_hf(text, max_length=None):
+    client = InferenceClient(provider="featherless-ai", api_key=os.environ["HF_TOKEN"])
     
-    reader = easyocr.Reader(['tr', 'en'], gpu=False)
-    results = reader.readtext(image, detail=0)
+    # Metin çok uzunsa parçala
+    if max_length and len(text) > max_length:
+        text = text[:max_length] + "..."
     
-    ilac = ' '.join(results[0:2])
-    st.write(f"Sisteme yüklenen ilaç: {ilac}")
+    prompt = f"{text} bu mesajı medikal içeriğine uygun ve yaşlıların da anlayacağı şekilde kısaca özetle. Paragraf yap. Madde başlığı olmasın."
     
-    prospektus = duckduckgo_search(f"{ilac} prospektüsü", max_sonuc=5)
-    if prospektus:
-        #summarized_text = summarize_text(prospektus)
-        summarized_text = get_response_with_medical_model(prospektus)
-        st.write(f"**Prospektüs Özeti:**\n{summarized_text}")
+    try:
+        response = client.chat.completions.create(
+            model="Intelligent-Internet/II-Medical-8B-1706",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=2048,  # Token limiti ekle
+            temperature=0.7
+        )
+        raw = response.choices[0].message.content
+        m = re.search(r"</think>\s*(.*)", raw, re.DOTALL)
+        return m.group(1).strip() if m else raw
+    except Exception as e:
+        print(f"Özetleme hatası: {e}")
+        return "Özetleme işlemi başarısız oldu."
+
+@app.route("/ozet", methods=["POST"])
+def prospektus_ozet():
+    data = request.json
+    ilac_adi = data.get("ilac")
+    if not ilac_adi:
+        return jsonify({"error": "İlaç adı gerekli"}), 400
+
+    try:
+        # Prospektüs metnini al
+        metin = get_prospektus(ilac_adi)
+        if not metin:
+            return jsonify({"error": "Prospektüs bulunamadı"}), 404
+
+        # Cache'e kaydet
+        prospektus_cache[ilac_adi] = metin
         
-        # Sesli oynatma
-        audio_base64 = vocaliaze_text(summarized_text)
-        if audio_base64:
-            audio_html = f'''
-            <audio controls autoplay>
-                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-                Tarayıcınız audio etiketini desteklemiyor.
-            </audio>
-            '''
-            st.markdown(audio_html, unsafe_allow_html=True)
+        # Özet oluştur
+        ozet = summarize_with_hf(metin, max_length=10000)  # 10K karakter limit
+        
+        return jsonify({
+            "ozet": ozet,
+            "metin_uzunlugu": len(metin),
+            "ozet_uzunlugu": len(ozet)
+        })
+    except Exception as e:
+        print(f"Özet endpoint hatası: {e}")
+        return jsonify({"error": f"İşlem başarısız: {str(e)}"}), 500
 
-        # Soru-cevap modülü
-        st.markdown("---")
-        st.subheader("Prospektüse Dayalı Soru-Cevap")
-        soru = st.text_input("Prospektüse göre bir soru sorun:")
-        if soru:
-            #cevap = cevapla_soru(soru, summarized_text)
-            cevap = qa_with_medical_model(soru, summarized_text)
-            st.markdown("**Cevap:**")
-            st.write(cevap)
-                
-        if st.button("🎤 Sesli Soru Sor (20 saniye)"):
-            sesli_soru = record_and_transcribe()
-            st.success(f"Algılanan Soru: {sesli_soru}")
-            cevap = qa_with_medical_model(sesli_soru, summarized_text)
-            st.markdown("**Cevap:**")
-            st.write(cevap)
-    else:
-        st.warning("Prospektüs bulunamadı. Lütfen farklı bir resim deneyin.")
+@app.route("/soru-cevap", methods=["POST"])
+def soru_cevap():
+    data = request.json
+    soru = data.get("soru")
+    ozet = data.get("ozet")
+    ilac_adi = data.get("ilac_adi", "")  # İlaç adını da gönder
+
+    if not soru or not ozet:
+        return jsonify({"error": "Soru ve özet gerekli"}), 400
+
+    try:
+        # Cache'den tam metni al
+        tam_metin = prospektus_cache.get(ilac_adi, "")
+        
+        # Eğer cache'de yoksa özeti kullan
+        if not tam_metin:
+            tam_metin = ozet
+        
+        client = InferenceClient(provider="featherless-ai", api_key=os.environ["HF_TOKEN"])
+        prompt = f"""
+            Aşağıda bir ilaç prospektüsünün tam metni verilmiştir.
+            Sadece bu metne dayalı soruları cevapla.
+            Eğer soru bu metinle ilgili değilse, şu şekilde yanıtla: "Bu sorunun cevabı mevcut prospektüs içinde bulunmamaktadır."
+
+            Prospektüs Metni:
+            \"\"\"{tam_metin[:15000]}\"\"\"
+
+            Soru: {soru}
+        """
+        
+        response = client.chat.completions.create(
+            model="Intelligent-Internet/II-Medical-8B-1706",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1024,
+            temperature=0.7
+        )
+        
+        msg = response.choices[0].message.content
+        m = re.search(r"</think>\s*(.*)", msg, re.DOTALL)
+        cevap = m.group(1).strip() if m else msg
+        
+        return jsonify({
+            "cevap": cevap,
+            "kullanilan_metin_uzunlugu": len(tam_metin)
+        })
+    except Exception as e:
+        print(f"Soru-cevap endpoint hatası: {e}")
+        return jsonify({"error": f"Cevap oluşturulamadı: {str(e)}"}), 500
+
+# Cache temizleme endpoint'i (isteğe bağlı)
+@app.route("/cache-temizle", methods=["POST"])
+def cache_temizle():
+    prospektus_cache.clear()
+    return jsonify({"mesaj": "Cache temizlendi"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
