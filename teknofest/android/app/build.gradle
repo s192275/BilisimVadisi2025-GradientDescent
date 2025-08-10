@@ -11,7 +11,7 @@ android {
     /* ─────────────────────────────────────────────
        🟢 SDK SEVİYELERİ
        ───────────────────────────────────────────── */
-    compileSdk = 35          // ← API 35
+    compileSdkVersion = 35          // ← API 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -19,7 +19,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = '1.8'
     }
 
     defaultConfig {
@@ -28,8 +28,8 @@ android {
         /*  minSdk, targetSdk ve versionCode / Name
             flutter.* makrolarını kullanmaya devam edebilirsiniz
             ancak targetSdk’yi elle aşıyoruz.                       */
-        minSdk       = flutter.minSdkVersion
-        targetSdk    = 35      // ← API 35  (🟢)
+        minSdkVersion       = 21
+        targetSdkVersion    = 35      // ← API 35  (🟢)
         versionCode  = flutter.versionCode
         versionName  = flutter.versionName
     }
@@ -38,9 +38,21 @@ android {
         release {
             // İmza ayarı: şimdilik debug keystore
             signingConfig = signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
             // istersen shrinkResources / minifyEnabled ekleyebilirsin
         }
     }
+}
+
+dependencies {
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.mlkit:text-recognition-chinese:16.0.0'
+    implementation 'com.google.mlkit:text-recognition-devanagari:16.0.0'
+    implementation 'com.google.mlkit:text-recognition-japanese:16.0.0'
+    implementation 'com.google.mlkit:text-recognition-korean:16.0.0'
 }
 
 flutter {

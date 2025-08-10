@@ -6,6 +6,8 @@ import 'upload_screen.dart';
 import 'history_screen.dart';
 import 'models/history_store.dart';
 
+
+// IpProvider'ı tüm uygulama genelinde kullanılabilir hale getir
 void main() {
   runApp(
     ChangeNotifierProvider(

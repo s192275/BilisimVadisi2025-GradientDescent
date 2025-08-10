@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSSpeechRecognitionUsageDescription</key>
+    <string>Sesli giriş özelliği için mikrofon kullanmamız gerekiyor.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Mikrofondan ses kaydı için izin gerekli.</string>
 </dict>
 </plist>

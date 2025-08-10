@@ -4,10 +4,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:flutter_markdown/flutter_markdown.dart'; // Markdown desteği için ekleyin
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../providers/ip_provider.dart';
 
 class ChatBotScreen extends StatefulWidget {
-  final String? drugSummary;
+  final String? drugSummary;    // Yeni parametre
   final String? initialSummary; // Yeni parametre
   final String? drugName;       // Yeni parametre
   final bool isResuming;        // Yeni parametre
@@ -34,14 +35,12 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   bool isSpeaking = false;
   String? currentSpeakingMessage;
   bool _isLoading = false; // API yükleme durumu
-
-  @override
-  void initState() {
-    super.initState();
-    initTts();
-    initMessages();
-  }
-
+  // Speech to text değişkenleri
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _lastWords = '';
+  
+  // Başlangıç mesajları
   void initMessages() {
     String? summary = widget.initialSummary ?? widget.drugSummary;
     String drugName = widget.drugName ?? 'İlaç';
@@ -98,14 +97,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     } catch (e) {
       debugPrint('TTS initialization error: $e');
     }
-  }
-
-  @override
-  void dispose() {
-    flutterTts.stop();
-    _controller.dispose();
-    _scrollController.dispose();
-    super.dispose();
   }
 
   // Metni seslendir
@@ -169,9 +160,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       _scrollToBottom();
       return;
     }
-
+    // IP provider ile IP adresini çekme
     final ipProvider = Provider.of<IpProvider>(context, listen: false);
-
+    
+    // Flask sunucusu üzerinden 5000 portundaki soru-cevap endpointine bağlanma
     try {
       final url = Uri.parse('${ipProvider.ip}:5000/soru-cevap');
       final response = await http.post(
@@ -181,7 +173,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           'soru': question,
           'ozet': summary,
         }),
-      ).timeout(Duration(seconds: 180));
+      ).timeout(Duration(seconds: 180)); // Timeout server kaynaklı bir sıkıntı çıkması durumunda 3 dk ya uzatıldı
 
       if (mounted) {
         if (response.statusCode == 200) {
@@ -219,7 +211,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       debugPrint('API error: $e');
     }
   }
-
+  
+  // Sohbet listesini en alta kaydır
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -231,7 +224,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       }
     });
   }
-
+  
+  // Mesajı gönder + API sorgusu
   void sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
@@ -254,7 +248,113 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     _controller.text = message;
     sendMessage();
   }
+  // Mikrofon ile konuşma başlat/durdur
+  Future<void> _listen() async {
+    if (!_isListening) {
+      // Önce mikrofon izni kontrolü yap
+      bool available = await _speech.initialize(
+        onStatus: (val) {
+          debugPrint('Speech status: $val');
+          if (val == 'done' || val == 'notListening') {
+            setState(() => _isListening = false);
+          }
+        },
+        onError: (val) {
+          debugPrint('Speech error: $val');
+          setState(() => _isListening = false);
 
+          // Hata mesajı göster
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Mikrofon hatası: ${val.errorMsg}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+      if (available) {
+        setState(() => _isListening = true);
+
+        await _speech.listen(
+            onResult: (val) {
+              setState(() {
+                _lastWords = val.recognizedWords;
+                _controller.text = _lastWords;
+                _controller.selection = TextSelection.fromPosition(
+                  TextPosition(offset: _controller.text.length),
+                );
+              });
+              // Eğer konuşma bitmiş gibi görünüyorsa otomatik durdur
+              if (val.finalResult) {
+                _stopListening();
+              }
+            },
+          localeId: 'tr-TR', // Türkçe için
+          listenFor: Duration(seconds: 30), // Maksimum dinleme süresi
+          pauseFor: Duration(seconds: 3), // Sessizlik süresi
+          partialResults: true, // Kısmi sonuçları göster
+          listenMode: stt.ListenMode.confirmation,
+          cancelOnError: true,
+          onSoundLevelChange: (level) {
+            // Ses seviyesi göstergesi için kullanılabilir
+            debugPrint('Sound level: $level');
+          },
+        );
+      } else {
+        // Mikrofon kullanılamıyor
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Mikrofon kullanılamıyor. İzin verdiğinizden emin olun.'),
+            backgroundColor: Colors.orange,
+            action: SnackBarAction(
+              label: 'AYARLAR',
+              onPressed: () {
+                // Uygulama ayarlarına yönlendir
+                // openAppSettings(); // permission_handler paketi gerekir
+              },
+            ),
+          ),
+        );
+      }
+    } else {
+      _stopListening();
+    }
+  }
+  // Ayrı bir durdurma fonksiyonu ekle
+  void _stopListening() {
+    setState(() => _isListening = false);
+    _speech.stop();
+  }
+
+// initState'e de ekle
+  @override
+  void initState() {
+    super.initState();
+    initTts();
+    initMessages();
+    _initSpeech(); // Bunu ekle
+  }
+
+// Speech başlatma fonksiyonu
+  void _initSpeech() async {
+    _speech = stt.SpeechToText();
+    bool available = await _speech.initialize();
+    if (!available) {
+      debugPrint('Speech recognition not available');
+    }
+  }
+
+// dispose'a da ekle
+  @override
+  void dispose() {
+    flutterTts.stop();
+    _controller.dispose();
+    _scrollController.dispose();
+    if (_isListening) {
+      _speech.stop(); // Sadece dinliyorsa durdur
+    }
+    super.dispose();
+  }
   Widget buildMessage(Map<String, String> msg) {
     bool isUser = msg['role'] == 'user';
     String messageText = msg['text'] ?? '';
@@ -574,6 +674,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         ),
         elevation: 2,
         actions: [
+          // Konuşma durumunda durdurma butonu
           if (isSpeaking)
             IconButton(
               icon: Icon(Icons.volume_off, color: Colors.white),
@@ -675,7 +776,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 itemCount: messages.length + (_isLoading ? 1 : 0),
                 itemBuilder: (_, i) {
                   if (i >= messages.length) {
-                    // Loading indicator
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                       child: Row(
@@ -800,7 +900,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                               decoration: InputDecoration(
                                 hintText: _isLoading
                                     ? 'Lütfen bekleyin...'
-                                    : 'Sorunuzu yazın...',
+                                    : 'Sorunuzu yazın veya konuşun...',
                                 hintStyle: TextStyle(
                                   fontSize: 15,
                                   color: Colors.grey.shade500,
@@ -822,6 +922,22 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                           ),
                         ),
                         SizedBox(width: 8),
+                        //Mikrofon butonu
+                        Container(
+                          decoration : BoxDecoration(
+                            color: _isListening ? Colors.red.shade100 : Colors.teal.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon : Icon(
+                              _isListening ? Icons.mic : Icons.mic_none,
+                              color: _isListening ? Colors.red : Colors.teal,
+                            ),
+                            onPressed: _listen,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(

@@ -518,6 +518,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         elevation: 4,
         actions: [
+          // Geçmiş kayıtlar varsa daha fazla seçenek menüsü göster
           if (_localHistory.isNotEmpty)
             PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: Colors.white),
@@ -901,7 +902,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
-
+  //Boş durum
   Widget _buildEmptyState() {
     return Center(
       child: Padding(

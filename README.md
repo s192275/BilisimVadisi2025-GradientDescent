@@ -26,26 +26,18 @@ Sistem, yaşlı bireylerin ihtiyaçlarına özel olarak tasarlanmış, sezgisel 
 
 ### **Kullanılan Teknolojiler**
 
-- **EasyOCR**: Görselden metin çıkarma için hızlı ve doğru çözüm.
-- **PyDuckDuckGo**: Güvenilir web verileri toplama.
+- **Flutter 3.** - Cross-platform framework
+- **Provider** - State management
+- **HTTP** - API iletişimi
+- **Flutter TTS** - Sesli okuma
+- **Camera** - Kamera işlemleri
+- **Image Picker** - Resim seçme
+- **Flutter Markdown** - Metin formatlama
+- **Speech To Text** - Konuşmanın metne dönüştürülmesi
+- **DDGS**: Güvenilir web verileri toplama.
 - **Intelligent-Internet/II-Medical8B-1706**: Prospektüs özetleme ve akıllı soru-cevap.
-- **gTTS**: Yazıyı doğal ses çıkışına dönüştürme.
-- **SpeechRecognition & Whisper**: Sesli girdileri metne çevirme.
-- **Streamlit**: Kullanıcı dostu ve modern web arayüzü.
 
-Sistem, **Hugging Face token** ve **GOOGLE_API_KEY** ile entegre bir şekilde Streamlit platformunda çalışmaktadır.
-
----
-
-### **Gelecekteki Yenilikler**
-
-Projemiz, mevcut haliyle güçlü bir temel sunuyor ve ilerleyen süreçlerde daha da gelişecek:
-
-- **📱 Mobil Uygulama Geliştirme**: Sistem testleri tamamlandıktan sonra, kullanıcı dostu bir mobil uygulama tasarlanacak ve uygulama mağazalarında yerini alacak.
-- **🧠 Gelişmiş NLP Özetleme**: Mobil uygulamada, ilaç prospektüslerinin özetlenmesi için ileri düzey doğal dil işleme (NLP) teknikleri kullanılacak.
-- **🚫 İlaç Dışı İçerik Kısıtlamaları**: İlaç dışı görsellerin yüklenmesini engelleyen filtreleme mekanizmaları eklenecek.
-- **🎯 Özel Başlık Erişimi**: Kullanıcılar, **yan etkiler**, **kullanım talimatları** veya **kontrendikasyonlar** gibi belirli başlıkları doğrudan görüntüleyip dinleyebilecek.
-- **📚 Büyük Dil Modeli İnce Ayar**: Kullanıcıların sorularına cevap verebilmesi için mobilde çalışabilecek küçük model eğitimleri yapılacaktır.
+Sistem, **Hugging Face token**  ve **Flask** ile entegre bir şekilde **Flutter** platformunda çalışmaktadır.
 
 ---
 
@@ -69,4 +61,3 @@ Projemiz, mevcut haliyle güçlü bir temel sunuyor ve ilerleyen süreçlerde da
 GradientDescent ekibi olarak, teknolojinin insan hayatını kolaylaştırması gerektiğine inanıyoruz. Yaşlı bireylerin sağlık hizmetlerine erişimdeki zorluklarını çözmek için **insan odaklı, yenilikçi ve erişilebilir** bir sistem geliştirdik. Teknofest 2025’te bu vizyonu hayata geçirerek, **yaşlı dostu teknolojilerle sağlık okuryazarlığını güçlendirmeyi** ve topluma değer katmayı hedefliyoruz!
 
 **GradientDescent ile sağlık bilgisi herkes için erişilebilir!**
-

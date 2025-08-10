@@ -41,7 +41,8 @@ class _UploadScreenState extends State<UploadScreen> {
 
   Future<bool> requestPermission(Permission permission) async {
     final status = await permission.status;
-
+    
+    // İzine göre true dön ya da tekrar iste
     if (status.isGranted) return true;
 
     if (status.isDenied) {
@@ -49,6 +50,7 @@ class _UploadScreenState extends State<UploadScreen> {
       return result.isGranted;
     }
 
+    // İzin kalıcı olarak reddedilmişse ayarlara yönlendir
     if (status.isPermanentlyDenied) {
       Fluttertoast.showToast(msg: 'İzin ayarlardan verilmelidir.');
       openAppSettings();
@@ -58,6 +60,7 @@ class _UploadScreenState extends State<UploadScreen> {
     return false;
   }
 
+  // Kamera ya da galeriden resim
   Future<void> pickImage(ImageSource source) async {
     bool granted = await requestPermission(
       source == ImageSource.camera
@@ -66,9 +69,11 @@ class _UploadScreenState extends State<UploadScreen> {
     );
 
     if (!granted) return;
-
+    
+    // Resim seç
     final picked = await ImagePicker().pickImage(source: source);
     if (picked != null) {
+      // Yeni resim seçildiğinde önceki durumları temizle
       setState(() {
         _image = File(picked.path);
         _showOCRResults = false;
@@ -84,6 +89,7 @@ class _UploadScreenState extends State<UploadScreen> {
     }
   }
 
+  // OCR
   Future<void> _performOCR() async {
     if (_image == null) return;
 
@@ -92,10 +98,12 @@ class _UploadScreenState extends State<UploadScreen> {
     });
 
     try {
+      // Resmi ML Kit için uygun formata çevir
       final inputImage = InputImage.fromFile(_image!);
       final textRecognizer = TextRecognizer();
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
+      // Tanınan metinleri birleştir
       String extractedText = '';
       for (TextBlock block in recognizedText.blocks) {
         for (TextLine line in block.lines) {
@@ -103,15 +111,18 @@ class _UploadScreenState extends State<UploadScreen> {
         }
       }
 
+      // Sonuçları UI'da göster
       setState(() {
         _extractedText = extractedText.trim();
         _ocrController.text = _extractedText ?? '';
         _showOCRResults = true;
         _isProcessingOCR = false;
       });
-
+      
+      // Kaynakları temizle
       await textRecognizer.close();
 
+      // Hiç metin yoksa uyar
       if (_extractedText?.isEmpty ?? true) {
         UploadDialogs.showNoTextDialog(context);
       }
@@ -126,7 +137,8 @@ class _UploadScreenState extends State<UploadScreen> {
       );
     }
   }
-
+  
+  // Tekrar resmi al
   void _retakePhoto() {
     setState(() {
       _image = null;
@@ -152,13 +164,14 @@ class _UploadScreenState extends State<UploadScreen> {
 
     final ipProvider = Provider.of<IpProvider>(context, listen: false);
     final first3Words = _getFirst3Words(_ocrController.text);
-
+    
     setState(() {
       _isLoadingAPIData = true;
       _apiError = null;
       _apiRequestCompleted = false;
     });
 
+    // ozet endpointine bağlan
     try {
       final url = Uri.parse('${ipProvider.ip}:5000/ozet');
       final response = await http.post(
@@ -176,6 +189,7 @@ class _UploadScreenState extends State<UploadScreen> {
         _apiRequestCompleted = true;
       });
 
+      // Response 200 döndüğünde formatı json'a göre ayarla
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -758,7 +772,7 @@ class _UploadScreenState extends State<UploadScreen> {
       );
     }
   }
-
+  
   Widget _buildTextEditField() {
     return TextField(
       controller: _ocrController,

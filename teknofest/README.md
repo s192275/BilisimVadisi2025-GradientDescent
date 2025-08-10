@@ -27,6 +27,7 @@ Flutter ile geliştirilmiş, kullanıcıların ilaçları hakkında AI destekli 
 - **Camera** - Kamera işlemleri
 - **Image Picker** - Resim seçme
 - **Flutter Markdown** - Metin formatlama
+- **Speech To Text** - Konuşmanın metne dönüştürülmesi
 
 ## 📋 Kurulum
 
@@ -39,7 +40,7 @@ Flutter ile geliştirilmiş, kullanıcıların ilaçları hakkında AI destekli 
 ### Adımlar
 ```bash
 # Projeyi klonla
-git clone https://github.com/your-repo/drug-assistant.git
+git clone https://github.com/s192275/BilisimVadisi2025-GradientDescent.git
 
 # Bağımlılıkları yükle
 flutter pub get

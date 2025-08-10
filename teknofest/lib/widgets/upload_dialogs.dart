@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class UploadDialogs {
-
+  // Okunabilir metin bulunamadığında gösterilen diyalog
   static void showNoTextDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -88,7 +88,7 @@ class UploadDialogs {
       ),
     );
   }
-
+  // Kullanıcı boş metin ile sorgu yapmaya çalıştığında bunu göster
   static void showEmptyTextWarning(BuildContext context) {
     showDialog(
       context: context,
@@ -175,7 +175,7 @@ class UploadDialogs {
       ),
     );
   }
-
+  // İzin reddi
   static void showPermissionDeniedDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -262,7 +262,7 @@ class UploadDialogs {
       ),
     );
   }
-
+  // OCR hatası [error] - Oluşan hata mesajı
   static void showOCRErrorDialog(BuildContext context, String error) {
     showDialog(
       context: context,
@@ -366,7 +366,7 @@ class UploadDialogs {
       ),
     );
   }
-
+  // Yükleme başarılı olduğundaki onay
   static void showUploadSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
