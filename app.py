@@ -30,7 +30,7 @@ def get_prospektus(ilac_adi:str) -> str:
     """
     query = f"{ilac_adi} prospektüsü"
     with DDGS() as ddgs:
-        results =list(itertools.islice(ddgs.text(query, region="wt-wt", safesearch="moderate")))
+        results =list(itertools.islice(ddgs.text(query, region="wt-wt", safesearch="moderate"),5))
         
     if not results:
         return None
