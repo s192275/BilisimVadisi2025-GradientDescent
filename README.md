@@ -18,7 +18,7 @@ Sistem, yaşlı bireylerin ihtiyaçlarına özel olarak tasarlanmış, sezgisel 
 1. **📷 Fotoğraf Yükleme**: Kullanıcı, ilaç kutusunun veya prospektüsün fotoğrafını Streamlit arayüzüne kolayca yükler.
 2. **🔍 Optik Karakter Tanıma (OCR)**: EasyOCR ile görseldeki metin hızlıca çıkarılır.
 3. **🌐 Web’den Bilgi Toplama**: PyDuckDuckGo ile ilaca dair güncel ve güvenilir bilgiler toplanır.
-4. **📝 Prospektüs Özeti**: Intelligent-Internet/II-Medical8B-1706 modeli, prospektüsü sade, anlaşılır ve yaşlı dostu bir şekilde özetler.
+4. **📝 Prospektüs Özeti**: Intelligent-Internet/II-Medical8B-1706 modeli, prospektüsü sade, anlaşılır ve orta yaşlı / yaşlı kesime hitap edebilecek bir şekilde özetler.
 5. **🎤 Sesli Soru-Cevap**: Kullanıcı, ilaca dair sorularını sesli sorar. SpeechRecognition ve Whisper ile sorular metne çevrilir, model tarafından yanıtlanır ve gTTS ile sesli olarak kullanıcıya sunulur.
 6. **🔊 Tamamen Sesli Etkileşim**: Dokunmatik ekran veya okuma gerektirmeden, sesli komutlarla sistem kolayca kullanılır.
 
