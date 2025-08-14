@@ -63,7 +63,7 @@ def get_prospektus(ilac_adi:str) -> str:
     # İkinci yaklaşım (Bu yaklaşım çok daha hızlı olduğu için bu tercih edildi.)
     for result in results:
         href = result.get('href', '')
-        if "ilacprospektusu.com/ilac/" in href:
+        if "ilacprospektusu.com/ilac/" in href or "medikalakademi.com.tr" in href or "ilacrehberi.com" in href or "ilacabak.com" in href:
             url = href
             try:
                 resp = requests.get(url, timeout=30, headers={'User-Agent': 'Mozilla/5.0'})
