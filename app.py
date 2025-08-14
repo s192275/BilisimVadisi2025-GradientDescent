@@ -121,7 +121,7 @@ def summarize_with_hf(text:str, max_length:int=None) -> str:
 @app.route("/ozet", methods=["POST"])
 def prospektus_ozet() -> dict:
     """
-    Metin özetini mobil uygulamanın beklediği json formatına çevirir ve hberleşmeyi sağlar.
+    Metin özetini mobil uygulamanın beklediği json formatına çevirir ve haberleşmeyi sağlar.
 
     Returns:
         dict: Metin özeti, Metin uzunluğu ve özet uzunluğunu içeren bir dictionary
