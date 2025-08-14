@@ -155,7 +155,7 @@ def prospektus_ozet() -> dict:
 @app.route("/soru-cevap", methods=["POST"])
 def soru_cevap() -> dict:
     """
-    Tam metne göre soru cevap işlemini mobil uygulamanın beklediği json formatına çevirir ve hberleşmeyi sağlar.
+    Tam metne göre soru cevap işlemini mobil uygulamanın beklediği json formatına çevirir ve haberleşmeyi sağlar.
 
     Returns:
         dict: Cevap ve kullanılan metin uzunluğunu içeren bir dictionary
