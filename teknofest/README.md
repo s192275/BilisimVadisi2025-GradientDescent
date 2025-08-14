@@ -45,6 +45,9 @@ git clone https://github.com/s192275/BilisimVadisi2025-GradientDescent.git
 # Bağımlılıkları yükle
 flutter pub get
 
+# Python tarafındaki bağımlılıkları yükle (app.py'ın bulunduğu sayfaya geçip)
+pip install -r requirements.txt
+
 # Uygulamayı çalıştır
 flutter run
 ```
