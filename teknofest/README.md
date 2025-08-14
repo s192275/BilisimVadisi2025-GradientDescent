@@ -48,6 +48,9 @@ flutter pub get
 # Python tarafındaki bağımlılıkları yükle (app.py'ın bulunduğu dizine geçip)
 pip install -r requirements.txt
 
+#Flask'ı ayağa kaldır.
+python app.py
+
 # Uygulamayı çalıştır
 flutter run
 ```
