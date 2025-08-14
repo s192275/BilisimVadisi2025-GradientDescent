@@ -20,7 +20,7 @@ def get_prospektus(ilac_adi:str) -> str:
     """
     Mobil uygulamadan test edilen ilaç adını ve mg cinsini birleştirerek DuckDuckGo üzerinde arama yapar ve sitelerdeki içeriklerden uygun olanı döner.
     Bu fonksiyonda 2 yaklaşımız var. İlk yaklaşım dönen sorguları tek tek modele atıp sonucun prospektüsle alakalı olup olmadığını bularak ilk uygun prospektüs içeriğini dönmek.
-    İkinci yaklaşımsa Türkiye genelinde bir çok ilaç prospektüsünü içeren ilacprospektusu.com adresini sorgulayıp oradaki içeriği dönmek.
+    İkinci yaklaşımsa Türkiye genelinde bir çok ilaç prospektüsünü içeren siteleri sorgulayıp oradaki içeriği dönmek.
     
     Args:
         ilac_adi (str): Araştırılması istenilen ilaç adı
